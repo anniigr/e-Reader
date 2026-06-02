@@ -17,12 +17,12 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="0" Content="Zamknij czytnik" Command="{Binding CloseCommand}" Padding="15,5" Background="#EEEEEE" BorderThickness="0" Cursor="Hand"/>
+                <Button Grid.Column="0" Content="Close" Command="{Binding CloseCommand}" Padding="15,5" Background="#EEEEEE" BorderThickness="0" Cursor="Hand"/>
 
                 <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,20,0">
-                    <Button Content="Poprzedni" Command="{Binding PrevPageCommand}" Width="80" Padding="5"/>
+                    <Button Content="Back" Command="{Binding PrevPageCommand}" Width="80" Padding="5"/>
                     <TextBlock Text="{Binding ProgressText}" VerticalAlignment="Center" Margin="15,0" FontWeight="SemiBold"/>
-                    <Button Content="Następny" Command="{Binding NextPageCommand}" Width="80" Padding="5"/>
+                    <Button Content="Next" Command="{Binding NextPageCommand}" Width="80" Padding="5"/>
                 </StackPanel>
             </Grid>
         </Border>

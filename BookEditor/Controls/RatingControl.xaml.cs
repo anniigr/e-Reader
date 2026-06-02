@@ -43,13 +43,11 @@ namespace BookEditor.Controls
 
         public Cursor CursorType => IsReadOnly ? Cursors.Arrow : Cursors.Hand;
 
-        // Добавляем переменную для хранения значения под курсором
         private int _hoverValue = 0;
 
         public RatingControl()
         {
             InitializeComponent();
-            // Poprawiona komenda: używamy Convert.ToInt32, aby uniknąć błędów rzutowania (p is int)
             RateCommand = new RelayCommand(p => {
                 if (!IsReadOnly && p != null)
                 {
@@ -67,7 +65,6 @@ namespace BookEditor.Controls
             control.PropertyChanged?.Invoke(control, new PropertyChangedEventArgs(nameof(CursorType)));
         }
 
-        // Изменяем UpdateStars: теперь он только один раз создает коллекцию
         private void UpdateStars()
         {
             if (Stars.Count == 0)
@@ -80,7 +77,6 @@ namespace BookEditor.Controls
             UpdateStarsVisuals();
         }
 
-        // Добавляем метод для обновления ТОЛЬКО иконок (без пересоздания списка)
         private void UpdateStarsVisuals()
         {
             int effectiveValue = _hoverValue > 0 ? _hoverValue : Value;
@@ -90,7 +86,6 @@ namespace BookEditor.Controls
             }
         }
 
-        // Обработчик наведения мыши
         private void Star_MouseEnter(object sender, MouseEventArgs e)
         {
             if (IsReadOnly) return;
@@ -101,7 +96,6 @@ namespace BookEditor.Controls
             }
         }
 
-        // Обработчик ухода мыши
         private void Star_MouseLeave(object sender, MouseEventArgs e)
         {
             if (IsReadOnly) return;
@@ -110,7 +104,6 @@ namespace BookEditor.Controls
         }
     }
 
-    // Делаем StarItem уведомляющим, чтобы интерфейс видел изменение свойства Icon
     public class StarItem : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;

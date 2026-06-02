@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:converters="clr-namespace:BookEditor.Converters"
         xmlns:controls="clr-namespace:BookEditor.Controls"
-        Title="Add/Edit Book" Height="550" Width="450" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+        Title="Add/Edit Book" Height="650" Width="450" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
 
     <Window.Resources>
         <converters:ByteArrayToImageConverter x:Key="ImageConverter"/>
@@ -37,6 +37,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <TextBlock Text="Title:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,5"/>
@@ -45,8 +46,14 @@
             <TextBlock Text="Author:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,5"/>
             <TextBox Text="{Binding Author, UpdateSourceTrigger=PropertyChanged}" Grid.Row="1" Grid.Column="1" Margin="0,5" Padding="2"/>
 
-            <TextBlock Text="File:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,5"/>
-            <Grid Grid.Row="2" Grid.Column="1" Margin="0,5">
+            <TextBlock Text="Rating:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,5"/>
+            <controls:RatingControl Value="{Binding Rating, Mode=TwoWay}"
+                         Grid.Row="2" Grid.Column="1"
+                         IsReadOnly="False" StarSize="20"
+                         Margin="0,5" HorizontalAlignment="Left"/>
+            
+            <TextBlock Text="File:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="0,5"/>
+            <Grid Grid.Row="3" Grid.Column="1" Margin="0,5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>

@@ -30,7 +30,6 @@ namespace BookEditor.ViewModels
             _mainViewModel = mainViewModel;
             Book = book;
 
-            // Подписка на изменения книги, чтобы обновлять UI (например, после чтения или редактирования)
             Book.PropertyChanged += (s, e) =>
             {
                 OnPropertyChanged(nameof(HasDescription));

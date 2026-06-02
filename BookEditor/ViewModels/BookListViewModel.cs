@@ -31,27 +31,26 @@ namespace BookEditor.ViewModels
             }
         }
 
-        // Filters
         private string _searchText = string.Empty;
         public string SearchText { get => _searchText; set { SetProperty(ref _searchText, value); ApplyFilters(); } }
 
-        private string _filterStatus = "Wszystkie";
+        private string _filterStatus = "All";
         public string FilterStatus { get => _filterStatus; set { SetProperty(ref _filterStatus, value); ApplyFilters(); } }
-        public ObservableCollection<string> StatusOptions { get; } = new() { "Wszystkie", "Nieprzeczytane", "W trakcie", "Przeczytane" };
+        public ObservableCollection<string> StatusOptions { get; } = new() { "All", "Unread", "Reading", "Read" };
 
         private int _filterRating = 0;
         public int FilterRating { get => _filterRating; set { SetProperty(ref _filterRating, value); ApplyFilters(); } }
         public ObservableCollection<int> RatingOptions { get; } = new() { 0, 1, 2, 3, 4, 5 };
 
-        private string _sortBy = "Tytuł";
+        private string _sortBy = "Title";
         public string SortBy { get => _sortBy; set { SetProperty(ref _sortBy, value); ApplyFilters(); } }
-        public ObservableCollection<string> SortOptions { get; } = new() { "Tytuł", "Autor", "Ocena" };
+        public ObservableCollection<string> SortOptions { get; } = new() { "Title", "Author", "Rating" };
 
         public ICommand ClearFiltersCommand { get; }
         public ICommand EditBookCommand { get; }
         public ICommand DeleteBookCommand { get; }
         public ICommand ViewDetailsCommand { get; }
-        public ICommand AddBookCommand { get; } // Дублируем для удобства кнопки на панели
+        public ICommand AddBookCommand { get; } 
 
         public BookListViewModel(MainViewModel mainViewModel)
         {
@@ -59,7 +58,7 @@ namespace BookEditor.ViewModels
             _mainViewModel.Repository.OnRepositoryChanged += ApplyFilters;
 
             ClearFiltersCommand = new RelayCommand(ClearFilters,
-                () => !string.IsNullOrEmpty(SearchText) || FilterStatus != "Wszystkie" || FilterRating != 0 || SortBy != "Tytuł");
+                () => !string.IsNullOrEmpty(SearchText) || FilterStatus != "All" || FilterRating != 0 || SortBy != "Title");
 
             AddBookCommand = new RelayCommand(AddBook);
             EditBookCommand = new RelayCommand(EditBook, () => SelectedBook != null);
@@ -72,9 +71,9 @@ namespace BookEditor.ViewModels
         private void ClearFilters()
         {
             SearchText = string.Empty;
-            FilterStatus = "Wszystkie";
+            FilterStatus = "All";
             FilterRating = 0;
-            SortBy = "Tytuł";
+            SortBy = "Title";
         }
 
         private void ApplyFilters()
@@ -85,15 +84,15 @@ namespace BookEditor.ViewModels
                 result = result.Where(b => b.Title.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
                                            b.Author.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
 
-            if (FilterStatus == "Nieprzeczytane") result = result.Where(b => b.Status == BookStatus.Unread);
-            else if (FilterStatus == "W trakcie") result = result.Where(b => b.Status == BookStatus.Reading);
-            else if (FilterStatus == "Przeczytane") result = result.Where(b => b.Status == BookStatus.Read);
+            if (FilterStatus == "Unread") result = result.Where(b => b.Status == BookStatus.Unread);
+            else if (FilterStatus == "Reading") result = result.Where(b => b.Status == BookStatus.Reading);
+            else if (FilterStatus == "Read") result = result.Where(b => b.Status == BookStatus.Read);
 
             if (FilterRating > 0) result = result.Where(b => b.Rating >= FilterRating);
 
             result = SortBy switch
             {
-                "Autor" => result.OrderBy(b => b.Author),
+                "Author" => result.OrderBy(b => b.Author),
                 "Ocena" => result.OrderByDescending(b => b.Rating),
                 _ => result.OrderBy(b => b.Title)
             };
@@ -142,7 +141,6 @@ namespace BookEditor.ViewModels
         {
             if (SelectedBook != null)
             {
-                // Переход на детальный вид. (BookDetailViewModel будет реализован в следующей части)
                 _mainViewModel.CurrentPage = new BookDetailViewModel(_mainViewModel, SelectedBook);
             }
         }

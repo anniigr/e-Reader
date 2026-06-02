@@ -22,6 +22,9 @@ namespace BookEditor.ViewModels
         private string _author = string.Empty;
         public string Author { get => _author; set => SetProperty(ref _author, value); }
 
+        private int _rating;
+        public int Rating { get => _rating; set => SetProperty(ref _rating, value); }
+
         private byte[]? _coverImage;
         public byte[]? CoverImage { get => _coverImage; set => SetProperty(ref _coverImage, value); }
 
@@ -44,8 +47,6 @@ namespace BookEditor.ViewModels
         public ICommand CancelCommand { get; }
 
         public event Action? CloseRequested;
-
-        // Конструктор
         public BookEditViewModel(Book? book, Action<Book> onSaveCallback)
         {
             _originalBook = book;
@@ -59,6 +60,7 @@ namespace BookEditor.ViewModels
                 Description = book.Description;
                 FilePath = book.FilePath;
                 foreach (var tag in book.Tags) Tags.Add(tag);
+                Rating = book.Rating;
             }
 
             BrowseCoverCommand = new RelayCommand(BrowseCover);
@@ -110,6 +112,7 @@ namespace BookEditor.ViewModels
             bookToSave.CoverImage = CoverImage;
             bookToSave.Description = Description;
             bookToSave.FilePath = FilePath;
+            bookToSave.Rating = Rating;
 
             bookToSave.Tags.Clear();
             foreach (var tag in Tags) bookToSave.Tags.Add(tag);

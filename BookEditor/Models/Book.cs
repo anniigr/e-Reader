@@ -24,7 +24,6 @@ namespace BookEditor.Models
         private BookStatus _status = BookStatus.Unread;
         private string _genre = string.Empty;
 
-        public Guid Id { get; set; } = Guid.NewGuid();
         public string Title { get => _title; set => SetProperty(ref _title, value); }
         public string Author { get => _author; set => SetProperty(ref _author, value); }
         public byte[]? CoverImage { get => _coverImage; set => SetProperty(ref _coverImage, value); }

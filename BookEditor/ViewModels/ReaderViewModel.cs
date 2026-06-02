@@ -30,7 +30,6 @@ namespace BookEditor.ViewModels
                     ((RelayCommand)NextPageCommand)?.RaiseCanExecuteChanged();
                     ((RelayCommand)PrevPageCommand)?.RaiseCanExecuteChanged();
 
-                    // Автосохранение позиции в репозиторий
                     Book.CurrentPage = value;
                     if (Book.CurrentPage == Book.TotalPages) Book.Status = BookStatus.Read;
                     _mainViewModel.Repository.Save();
@@ -39,7 +38,7 @@ namespace BookEditor.ViewModels
         }
 
         public string CurrentHtmlContent => _pages.Count > 0 && _currentPageIndex > 0 ? ConvertMarkdownToHtml(_pages[_currentPageIndex - 1]) : "";
-        public string ProgressText => $"Rozdział {CurrentPageIndex} z {Book.TotalPages}";
+        public string ProgressText => $"Chapter {CurrentPageIndex} from {Book.TotalPages}";
 
         public ICommand NextPageCommand { get; }
         public ICommand PrevPageCommand { get; }
@@ -64,12 +63,11 @@ namespace BookEditor.ViewModels
             if (File.Exists(Book.FilePath))
             {
                 string text = File.ReadAllText(Book.FilePath);
-                // Разбиваем текст на главы по Markdown-заголовкам 1-го и 2-го уровня
                 var chunks = Regex.Split(text, @"(?=^#{1,2} )", RegexOptions.Multiline)
                                   .Where(s => !string.IsNullOrWhiteSpace(s))
                                   .ToList();
 
-                if (!chunks.Any()) chunks.Add(text); // Если заголовков нет, все одним куском
+                if (!chunks.Any()) chunks.Add(text); 
 
                 _pages = chunks;
                 Book.TotalPages = _pages.Count;
@@ -77,7 +75,7 @@ namespace BookEditor.ViewModels
             }
             else
             {
-                _pages.Add("# Błąd\nPlik nie istnieje lub został przeniesiony.");
+                _pages.Add("# Error\nFile does not exist or has been moved.");
                 Book.TotalPages = 1;
             }
         }
@@ -86,13 +84,13 @@ namespace BookEditor.ViewModels
         {
             string html = "<html><body style='font-family:\"Segoe UI\", Arial, sans-serif; font-size:16px; line-height:1.6; color:#333; padding:20px;'>";
 
-            md = Regex.Replace(md, @"\*\*(.+?)\*\*", "<b>$1</b>"); // Жирный
-            md = Regex.Replace(md, @"\*(.+?)\*", "<i>$1</i>");     // Курсив
-            md = Regex.Replace(md, @"^### (.*?)$", "<h3>$1</h3>", RegexOptions.Multiline); // H3
-            md = Regex.Replace(md, @"^## (.*?)$", "<h2 style='border-bottom:1px solid #ccc;'>$1</h2>", RegexOptions.Multiline); // H2
-            md = Regex.Replace(md, @"^# (.*?)$", "<h1 style='color:#2196F3;'>$1</h1>", RegexOptions.Multiline); // H1
-
-            md = md.Replace("\r\n", "<br/>").Replace("\n", "<br/>"); // Переносы
+            md = Regex.Replace(md, @"\*\*(.+?)\*\*", "<b>$1</b>"); 
+            md = Regex.Replace(md, @"\*(.+?)\*", "<i>$1</i>");    
+            md = Regex.Replace(md, @"^### (.*?)$", "<h3>$1</h3>", RegexOptions.Multiline); 
+            md = Regex.Replace(md, @"^## (.*?)$", "<h2 style='border-bottom:1px solid #ccc;'>$1</h2>", RegexOptions.Multiline); 
+            md = Regex.Replace(md, @"^# (.*?)$", "<h1 style='color:#2196F3;'>$1</h1>", RegexOptions.Multiline);
+            md = Regex.Replace(md, @"`(.+?)`", "<code>$1</code>");
+            md = md.Replace("\r\n", "<br/>").Replace("\n", "<br/>"); 
             html += md + "</body></html>";
             return html;
         }
