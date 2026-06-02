@@ -1,0 +1,47 @@
+<UserControl x:Class="BookEditor.Controls.RatingControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Name="Root">
+    <ItemsControl ItemsSource="{Binding Stars, ElementName=Root}">
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal"/>
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <Button Command="{Binding RateCommand, ElementName=Root}"
+            CommandParameter="{Binding Value}"
+            Background="Transparent"
+            BorderThickness="0"
+            Padding="0"
+            Margin="2,0"
+            Cursor="{Binding CursorType, ElementName=Root}">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <ContentPresenter />
+                        </ControlTemplate>
+                    </Button.Template>
+
+                    <TextBlock Text="{Binding Icon}"
+                   FontSize="{Binding StarSize, ElementName=Root}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="LightGray"/>
+
+                                <EventSetter Event="MouseEnter" Handler="Star_MouseEnter"/>
+                                <EventSetter Event="MouseLeave" Handler="Star_MouseLeave"/>
+
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Icon}" Value="★">
+                                        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Button>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+</UserControl>

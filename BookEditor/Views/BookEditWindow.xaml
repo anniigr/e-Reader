@@ -1,0 +1,95 @@
+<Window x:Class="BookEditor.Views.BookEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:converters="clr-namespace:BookEditor.Converters"
+        xmlns:controls="clr-namespace:BookEditor.Controls"
+        Title="Add/Edit Book" Height="550" Width="450" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+
+    <Window.Resources>
+        <converters:ByteArrayToImageConverter x:Key="ImageConverter"/>
+    </Window.Resources>
+
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,0,0,15">
+            <Border Width="120" Height="160" BorderBrush="Gray" BorderThickness="1" Background="#EEE">
+                <Grid>
+                    <TextBlock Text="No Cover" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Gray"/>
+                    <Image Source="{Binding CoverImage, Converter={StaticResource ImageConverter}}" Stretch="UniformToFill" />
+                </Grid>
+            </Border>
+            <Button Content="Browse Image..." Command="{Binding BrowseCoverCommand}" Margin="0,10,0,0" Padding="5"/>
+        </StackPanel>
+
+        <Grid Grid.Row="1" Margin="0,0,0,15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Title:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,5"/>
+            <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" Grid.Row="0" Grid.Column="1" Margin="0,5" Padding="2"/>
+
+            <TextBlock Text="Author:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,5"/>
+            <TextBox Text="{Binding Author, UpdateSourceTrigger=PropertyChanged}" Grid.Row="1" Grid.Column="1" Margin="0,5" Padding="2"/>
+
+            <TextBlock Text="File:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,5"/>
+            <Grid Grid.Row="2" Grid.Column="1" Margin="0,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox Text="{Binding FilePath}" IsReadOnly="True" Padding="2"/>
+                <Button Content="..." Command="{Binding BrowseBookCommand}" Grid.Column="1" Width="30" Margin="5,0,0,0"/>
+            </Grid>
+        </Grid>
+
+        <StackPanel Grid.Row="2">
+            <TextBlock Text="Description:" Margin="0,0,0,5"/>
+            <TextBox Text="{Binding Description}" TextWrapping="Wrap" AcceptsReturn="True" Height="60" Margin="0,0,0,10" Padding="2"/>
+
+            <TextBlock Text="Tags:" Margin="0,0,0,5"/>
+            <Grid Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox Text="{Binding NewTag, UpdateSourceTrigger=PropertyChanged}" Padding="2">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding AddTagCommand}"/>
+                    </TextBox.InputBindings>
+                </TextBox>
+                <Button Content="Add Tag" Command="{Binding AddTagCommand}" Grid.Column="1" Margin="5,0,0,0" Padding="10,0"/>
+            </Grid>
+            <controls:TagControl Tags="{Binding Tags}" RemoveTagCommand="{Binding RemoveTagCommand}" IsReadOnly="False" ChipBackground="{DynamicResource PrimaryBrush}"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Cancel" Command="{Binding CancelCommand}" Width="80" Height="30" Margin="0,0,10,0"/>
+            <Button Content="Save" Command="{Binding SaveCommand}" Width="80" Height="30" Background="{DynamicResource AccentBrush}" Foreground="White">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="LightGray"/>
+                                <Setter Property="Foreground" Value="DarkGray"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </StackPanel>
+    </Grid>
+</Window>

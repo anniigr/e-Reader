@@ -1,0 +1,21 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docview
+
+# Build output
+bin/
+obj/
+
+# NuGet
+*.nupkg
+packages/
+project.assets.json
+project.nuget.cache
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store

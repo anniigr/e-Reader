@@ -1,0 +1,37 @@
+<UserControl x:Class="BookEditor.Views.ReaderView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:helpers="clr-namespace:BookEditor.Helpers">
+    <Grid Background="#FAFAFA">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="White" BorderBrush="#DDD" BorderThickness="0,0,0,1">
+            <Grid Margin="10,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0" Content="Zamknij czytnik" Command="{Binding CloseCommand}" Padding="15,5" Background="#EEEEEE" BorderThickness="0" Cursor="Hand"/>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,20,0">
+                    <Button Content="Poprzedni" Command="{Binding PrevPageCommand}" Width="80" Padding="5"/>
+                    <TextBlock Text="{Binding ProgressText}" VerticalAlignment="Center" Margin="15,0" FontWeight="SemiBold"/>
+                    <Button Content="Następny" Command="{Binding NextPageCommand}" Width="80" Padding="5"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1" Background="White" Margin="40,20" Padding="1" BorderBrush="#CCC" BorderThickness="1">
+            <Border.Effect>
+                <DropShadowEffect Color="Black" Opacity="0.1" BlurRadius="10" ShadowDepth="2"/>
+            </Border.Effect>
+            <WebBrowser helpers:WebBrowserBehavior.Html="{Binding CurrentHtmlContent}"/>
+        </Border>
+    </Grid>
+</UserControl>

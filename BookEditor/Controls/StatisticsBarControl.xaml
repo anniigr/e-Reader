@@ -1,0 +1,37 @@
+<UserControl x:Class="BookEditor.Controls.StatisticsBarControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Height="24" Background="#F0F0F0" BorderBrush="#CCC" BorderThickness="0,1,0,0">
+    <Grid Margin="10,0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Column="0" VerticalAlignment="Center" Margin="0,0,15,0">
+            <Run Text="Total books: " FontWeight="SemiBold"/>
+            <Run Text="{Binding TotalBooks, Mode=OneWay}"/>
+        </TextBlock>
+
+        <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="0,0,15,0">
+            <Run Text="Read/Reading: " FontWeight="SemiBold"/>
+            <Run Text="{Binding ReadOrReadingBooks, Mode=OneWay}"/>
+        </TextBlock>
+
+        <TextBlock Grid.Column="2" VerticalAlignment="Center" Margin="0,0,15,0">
+            <Run Text="Avg Rating: " FontWeight="SemiBold"/>
+            <Run Text="{Binding AverageRating, Mode=OneWay}"/>
+        </TextBlock>
+
+        <TextBlock Grid.Column="3" VerticalAlignment="Center" Margin="0,0,15,0">
+            <Run Text="Top Tag: " FontWeight="SemiBold"/>
+            <Run Text="{Binding PopularGenre, Mode=OneWay}"/>
+        </TextBlock>
+
+        <TextBlock Grid.Column="5" Text="{Binding StatusMessage}" VerticalAlignment="Center" Foreground="DimGray" FontStyle="Italic"/>
+    </Grid>
+</UserControl>
