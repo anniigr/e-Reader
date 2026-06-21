@@ -16,6 +16,35 @@ The data persistence layer is based on a **file repository pattern** using JSON 
 
 All UI interactions follow the **Command pattern** via `ICommand` bindings, and the application leverages **custom WPF UserControls** with **DependencyProperty** registration for reusable, data-bound components.
 
+
+<details>
+  <summary><b>Library Mode </b></summary>
+  <br>
+  
+  ![image](Images/photo1.jpg)
+</details>
+
+<details>
+  <summary><b>Book View Mode </b></summary>
+  <br>
+  
+  ![image](Images/photo2.jpg)
+</details>
+
+<details>
+  <summary><b>Editing Mode </b></summary>
+  <br>
+  
+  ![image](Images/photo3.jpg)
+</details>
+
+<details>
+  <summary><b>Reader Mode </b></summary>
+  <br>
+  
+  ![image](Images/photo4.jpg)
+</details>
+
 ---
 
 ## 🏗️ Architectural Highlights
