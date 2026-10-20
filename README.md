@@ -1,173 +1,110 @@
-# 📚 Libraria: WPF Desktop Book Manager — MVVM & Repository Architecture
+# Libraria
 
-<p align="center">
-  <img src="https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white" alt="C#"/>
-  <img src="https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt=".NET 8"/>
-  <img src="https://img.shields.io/badge/Architecture-MVVM-blue?style=for-the-badge" alt="Architecture: MVVM"/>
-  <img src="https://img.shields.io/badge/UI-WPF%20%2F%20XAML-orange?style=for-the-badge" alt="WPF XAML"/>
-  <img src="https://img.shields.io/badge/Storage-JSON%20Repository-success?style=for-the-badge" alt="JSON Storage"/>
-</p>
+A WPF desktop application for managing a personal book collection and reading Markdown books
+inside the app. Built on .NET 8 with an MVVM structure: a JSON-backed repository holds the
+books, each screen is a ViewModel resolved to a View through `DataTemplate`, and every user
+action is an `ICommand`. Covers are stored inline as bytes, reading progress and status are
+tracked per book, and the status bar aggregates statistics live from the repository.
 
-## 📖 Overview
+Developed as a project for the Object-Oriented Programming course at Warsaw University of
+Technology.
 
-**Libraria** is a desktop application for managing a personal book collection, built with **WPF (.NET 8)** and a strict **MVVM architecture**. The project implements a clean separation between the data model, business logic, and UI layer — ensuring full testability and scalability.
+## Preview
 
-The data persistence layer is based on a **file repository pattern** using JSON serialization. Books are stored in user-defined `.json` files that can be created, shared, and opened across sessions. The interface supports full **CRUD operations**, cover image management, reading progress tracking, star rating, genre tagging, and an integrated reader view for linked PDF/ebook files.
+Screenshots of the application running on Windows 11 with the sample repository.
 
-All UI interactions follow the **Command pattern** via `ICommand` bindings, and the application leverages **custom WPF UserControls** with **DependencyProperty** registration for reusable, data-bound components.
+![Library grid with search, status, rating and sort filters](Images/photo1.jpg)
 
+| Book details with progress, tags and reading actions | Add/Edit dialog with cover, rating, tags and file picker |
+| :--: | :--: |
+| ![Book details](Images/photo2.jpg) | ![Edit dialog](Images/photo3.jpg) |
 
-<details>
-  <summary><b>Library Mode </b></summary>
-  <br>
-  
-  ![image](Images/photo1.jpg)
-</details>
+![Built-in reader rendering a Markdown chapter](Images/photo4.jpg)
 
-<details>
-  <summary><b>Book View Mode </b></summary>
-  <br>
-  
-  ![image](Images/photo2.jpg)
-</details>
+## Features
 
-<details>
-  <summary><b>Editing Mode </b></summary>
-  <br>
-  
-  ![image](Images/photo3.jpg)
-</details>
+- **Repositories.** A library is a single `.librepo` file (JSON). Create a new one or open an
+  existing one from the `Repository` menu; every change is written back immediately.
+- **Library view.** Cover grid with live search by title or author, filters by reading status
+  and minimum rating, sorting by title or author, and a `Clear Filters` action that is enabled
+  only when a filter is active. Double-click opens a book; `Delete` removes the selected one.
+- **Book details.** Cover, author, reading progress (`current / total` chapters), tag chips,
+  description, and buttons to read from the beginning, continue reading, or edit.
+- **Add/Edit dialog.** Title, author, five-star rating, cover image picker (PNG/JPEG), Markdown
+  file picker, description, and tag management. `Save` is disabled until a title is entered.
+- **Reader.** Splits the linked Markdown file into chapters at `#` and `##` headings, converts
+  each chapter to HTML with a small regex converter and shows it in a `WebBrowser` control.
+  Page position is saved to the book; opening a book sets it to `Reading`, reaching the last
+  chapter sets it to `Read`.
+- **Statistics bar.** Total books, books read or in progress, average rating of rated books,
+  and the most frequent tag, recomputed on every repository change.
 
-<details>
-  <summary><b>Reader Mode </b></summary>
-  <br>
-  
-  ![image](Images/photo4.jpg)
-</details>
-
----
-
-## 🏗️ Architectural Highlights
-
-- **Model:** Plain C# classes (`Book`, `AppRepository`) with `INotifyPropertyChanged` support. Zero references to WPF or UI layer. Persistence handled by `AppRepository` using `System.Text.Json`.
-- **ViewModel:** Derives from `BaseViewModel` which implements `INotifyPropertyChanged`. Each view has a dedicated ViewModel exposing `ICommand` properties and observable state. Navigation is managed by `MainViewModel` via a `CurrentPage` property.
-- **View:** Pure XAML with no code-behind logic. Data binding connects Views to ViewModels entirely through `DataTemplate` mappings registered in `App.xaml`.
-- **Custom Controls:** Reusable `UserControl` components (`RatingControl`, `TagControl`, `StatisticsBarControl`) expose `DependencyProperty` APIs and are fully composable via XAML binding.
-
----
-
-## 🧩 Applied Patterns & Techniques
-
-| Pattern / Technique | Implementation | Solved Problem |
-| :--- | :--- | :--- |
-| **MVVM** | `BaseViewModel` → `BookListViewModel`, `BookDetailViewModel`, `ReaderViewModel` | Decouples UI from logic; enables testable ViewModels with zero WPF dependencies |
-| **Repository** | `AppRepository` with `Create()` / `Load()` / `Save()` | Encapsulates all file I/O and collection management behind a single interface |
-| **Command** | `RelayCommand` wrapping `Action<object>` | Binds all user interactions (add, edit, delete, rate) to ViewModel methods via `ICommand` |
-| **Observer** | `ObservableCollection<Book>` + `INotifyPropertyChanged` | Automatic UI refresh on any model mutation without manual event wiring |
-| **DataTemplate** | `App.xaml` maps ViewModel types to View types | Enables view-less navigation — `MainViewModel` switches pages by changing `CurrentPage` type |
-| **Value Converter** | `ByteArrayToImageConverter` (`IValueConverter`) | Converts raw `byte[]` cover data to `BitmapImage` for display without polluting the ViewModel |
-| **Attached Behavior** | `WebBrowserBehavior.HtmlProperty` | Enables MVVM-safe HTML binding for the `WebBrowser` control which does not natively support `Source` binding |
-| **DependencyProperty** | `RatingControl`, `TagControl` | Allows custom controls to participate in WPF data binding, animations, and style triggers |
-
----
-
-## 🚀 Key Features
-
-<details>
-<summary><strong>MVVM Navigation & Shell</strong></summary>
-
-`MainViewModel` acts as an application shell. It exposes a `CurrentPage` property of type `BaseViewModel`. Switching pages (Welcome → BookList → BookDetail → Reader) is done by assigning a new ViewModel instance — the corresponding View is resolved automatically via `DataTemplate` mappings registered in `App.xaml` and `MainWindow.xaml`.
+## Architecture
 
 ```mermaid
-classDiagram
-    direction TB
+flowchart LR
+    subgraph View["View (XAML)"]
+        MW[MainWindow<br/>menu, header, ContentControl, StatisticsBarControl]
+        WV[WelcomeView]
+        LV[BookListView]
+        DV[BookDetailView]
+        RV[ReaderView]
+        EW[BookEditWindow]
+    end
+    subgraph VM["ViewModels"]
+        MVM[MainViewModel<br/>CurrentPage, StatusMessage,<br/>Create/Open repo]
+        WVM[WelcomeViewModel]
+        LVM[BookListViewModel<br/>FilteredBooks, filters, CRUD]
+        DVM[BookDetailViewModel]
+        RVM[ReaderViewModel<br/>chapters, HTML]
+        EVM[BookEditViewModel]
+        SVM[StatisticsViewModel]
+    end
+    subgraph Model["Model"]
+        REPO[AppRepository<br/>ObservableCollection&lt;Book&gt;,<br/>Load / Create / Save]
+        BOOK[Book]
+        FILE[(.librepo JSON)]
+    end
 
-    class MainViewModel {
-        +BaseViewModel CurrentPage
-        +StatisticsViewModel Statistics
-        +ICommand CreateRepoCommand
-        +ICommand OpenRepoCommand
-        -AppRepository _repository
-        -NavigateTo(BaseViewModel page)
-    }
-
-    class BaseViewModel {
-        <<abstract>>
-        #SetProperty~T~(ref T field, T value)
-        +PropertyChanged event
-    }
-
-    class WelcomeViewModel {
-        +ICommand OpenRepoCommand
-        +ICommand CreateRepoCommand
-    }
-
-    class BookListViewModel {
-        +ObservableCollection~Book~ Books
-        +Book SelectedBook
-        +ICommand AddBookCommand
-        +ICommand EditBookCommand
-        +ICommand DeleteBookCommand
-        +string SearchText
-        +string SelectedGenre
-    }
-
-    class BookDetailViewModel {
-        +Book EditedBook
-        +ICommand SaveCommand
-        +ICommand CancelCommand
-        +ICommand PickCoverCommand
-        +ICommand AddTagCommand
-        +ICommand RemoveTagCommand
-    }
-
-    class ReaderViewModel {
-        +Book Book
-        +string HtmlContent
-        +int CurrentPage
-        +ICommand NextPageCommand
-        +ICommand PrevPageCommand
-    }
-
-    class StatisticsViewModel {
-        +int TotalBooks
-        +int ReadOrReadingBooks
-        +string AverageRating
-        +string PopularGenre
-        +string StatusMessage
-    }
-
-    MainViewModel --> BaseViewModel : CurrentPage
-    MainViewModel *-- StatisticsViewModel
-    BaseViewModel <|-- WelcomeViewModel
-    BaseViewModel <|-- BookListViewModel
-    BaseViewModel <|-- BookDetailViewModel
-    BaseViewModel <|-- ReaderViewModel
-    BaseViewModel <|-- StatisticsViewModel
+    MW -- "DataTemplate per ViewModel type" --> WV & LV & DV & RV
+    MW --> MVM
+    MVM -- CurrentPage --> WVM & LVM & DVM & RVM
+    MVM --> SVM
+    LVM & DVM -- ShowDialog --> EW --> EVM
+    LVM & DVM & RVM & SVM --> REPO
+    REPO --> BOOK
+    REPO <--> FILE
 ```
-</details>
 
-<details>
-<summary><strong>Repository & Data Model</strong></summary>
+- **Navigation without a frame.** `MainViewModel.CurrentPage` holds the active ViewModel. A
+  `ContentControl` bound to it picks the matching View through the `DataTemplate` mappings in
+  `App.xaml`, so switching screens is an assignment, not a window operation.
+- **Auto-save.** `AppRepository` subscribes to `CollectionChanged` on the book list and to
+  `PropertyChanged` on every book and its tag collection. Any edit serialises the whole
+  collection with `System.Text.Json` (indented) to the open `.librepo` file and raises
+  `OnRepositoryChanged`, which the list and statistics ViewModels use to refresh.
+- **Commands.** `RelayCommand` wraps `Action` or `Action<object?>` with an optional
+  `CanExecute`, hooked into `CommandManager.RequerySuggested` so button states update
+  automatically. Menu items bind to `CurrentPage.AddBookCommand` and friends, so they are only
+  active on the list screen.
+- **Edit dialog lifecycle.** `BookEditViewModel` works on a copy of the fields and writes them
+  back to the original `Book` (or a new one) only on `Save`; a `CloseRequested` event lets the
+  ViewModel close the modal window without referencing it.
 
-`AppRepository` is the single source of truth for all book data. It manages an `ObservableCollection<Book>` and auto-saves to a JSON file whenever the collection or any book's property changes. This is achieved by attaching `CollectionChanged` and `PropertyChanged` handlers during `Load()` and `AddBook()`.
+### Data model
 
 ```mermaid
 classDiagram
     class AppRepository {
-        -string _currentFilePath
         +ObservableCollection~Book~ Books
         +event Action OnRepositoryChanged
-        +Create(filePath: string)
-        +Load(filePath: string)
-        +AddBook(book: Book)
-        +RemoveBook(book: Book)
+        +Create(path)
+        +Load(path)
+        +AddBook(Book)
+        +RemoveBook(Book)
         +Save()
-        -AttachEvents()
     }
-
     class Book {
-        +Guid Id
         +string Title
         +string Author
         +byte[] CoverImage
@@ -180,161 +117,101 @@ classDiagram
         +BookStatus Status
         +string Genre
     }
-
     class BookStatus {
-        <<enum>>
+        <<enumeration>>
         Unread
         Reading
         Read
     }
-
-    AppRepository "1" *-- "0..*" Book : manages
-    Book --> BookStatus : has
-```
-</details>
-
-<details>
-<summary><strong>Custom WPF Controls</strong></summary>
-
-Three reusable `UserControl` components are implemented with full `DependencyProperty` support, enabling them to participate in WPF data binding, styling, and animations.
-
-**`RatingControl`** — An interactive 5-star rating widget. Supports hover preview (fills stars on mouse-over), click-to-rate, and a read-only display mode. Internally manages a `StarItem` collection with `INotifyPropertyChanged`, so the icon character (`★` / `☆`) updates reactively without recreating the list.
-
-**`TagControl`** — Displays a collection of string tags as removable pill-shaped chips using a `WrapPanel`. Supports read-only mode (hides the remove button via `DataTrigger`) and exposes `RemoveTagCommand` as a `DependencyProperty`.
-
-**`StatisticsBarControl`** — A slim status bar docked at the bottom of the main window. Binds to `StatisticsViewModel` to display live-updated aggregate data: total books, read/reading count, average rating, and most popular genre.
-
-```mermaid
-classDiagram
-    class RatingControl {
-        +DependencyProperty ValueProperty
-        +DependencyProperty IsReadOnlyProperty
-        +DependencyProperty StarSizeProperty
-        +ObservableCollection~StarItem~ Stars
-        +ICommand RateCommand
-        -int _hoverValue
-        -UpdateStars()
-        -UpdateStarsVisuals()
-        -Star_MouseEnter()
-        -Star_MouseLeave()
+    class BaseViewModel {
+        <<abstract>>
+        +PropertyChanged
+        #SetProperty(ref field, value) bool
     }
-
-    class StarItem {
-        +int Value
-        +string Icon
-        +PropertyChanged event
-    }
-
-    class TagControl {
-        +DependencyProperty TagsProperty
-        +DependencyProperty IsReadOnlyProperty
-        +DependencyProperty RemoveTagCommandProperty
-        +DependencyProperty ChipBackgroundProperty
-    }
-
-    class StatisticsBarControl {
-        -- binds to StatisticsViewModel --
-    }
-
-    RatingControl "1" *-- "5" StarItem
-```
-</details>
-
-<details>
-<summary><strong>Value Converters & Attached Behaviors</strong></summary>
-
-**`ByteArrayToImageConverter`** — Implements `IValueConverter` to convert `byte[]` (stored in the `Book` model) into a WPF `BitmapImage`. The conversion uses a `MemoryStream` with `BitmapCacheOption.OnLoad` to avoid file handle retention. Registered as a global resource and referenced directly in XAML bindings.
-
-**`WebBrowserBehavior`** — An attached property that enables binding HTML strings to the legacy `WebBrowser` control. Since `WebBrowser.Source` does not support standard `{Binding}` syntax, this behavior exposes an attached `Html` property. When the value changes, it calls `browser.NavigateToString()`, keeping the ViewModel's HTML content fully separated from the View.
-
-```mermaid
-classDiagram
-    class ByteArrayToImageConverter {
-        +Convert(value, targetType, parameter, culture) object
-        +ConvertBack(...) object
-    }
-
-    class WebBrowserBehavior {
-        +DependencyProperty HtmlProperty$
-        +GetHtml(obj: DependencyObject) string$
-        +SetHtml(obj: DependencyObject, value: string)$
-        -OnHtmlChanged(d, e)$
-    }
-
-    class IValueConverter {
-        <<interface>>
-        +Convert()
-        +ConvertBack()
-    }
-
-    ByteArrayToImageConverter ..|> IValueConverter
-```
-</details>
-
----
-
-## 🗂️ Project Structure
-
-```
-BookEditor/
-├── Models/
-│   ├── Book.cs                  # Core entity with INotifyPropertyChanged
-│   └── AppRepository.cs         # JSON persistence & collection management
-│
-├── ViewModels/
-│   ├── BaseViewModel.cs         # SetProperty + INotifyPropertyChanged base
-│   ├── MainViewModel.cs         # Shell: navigation + repository wiring
-│   ├── WelcomeViewModel.cs      # Entry screen commands
-│   ├── BookListViewModel.cs     # List, filtering, selection, CRUD commands
-│   ├── BookDetailViewModel.cs   # Add/Edit form with tag and cover management
-│   ├── ReaderViewModel.cs       # In-app reader with page navigation
-│   ├── StatisticsViewModel.cs   # Aggregate stats computed from repository
-│   └── RelayCommand.cs          # Generic ICommand implementation
-│
-├── Views/
-│   ├── WelcomeView.xaml         # Landing screen
-│   ├── BookListView.xaml        # Main library grid/list
-│   ├── BookDetailView.xaml      # Add/Edit book dialog
-│   └── ReaderView.xaml          # Ebook reader panel
-│
-├── Controls/
-│   ├── RatingControl.xaml/.cs   # Reusable star rating widget
-│   ├── TagControl.xaml/.cs      # Tag chip list with remove support
-│   └── StatisticsBarControl.xaml/.cs  # Bottom status bar
-│
-├── Converters/
-│   └── ByteArrayToImageConverter.cs   # byte[] → BitmapImage
-│
-├── Helpers/
-│   └── WebBrowserBehavior.cs    # Attached HTML binding for WebBrowser
-│
-├── App.xaml                     # Global resources, DataTemplate mappings
-└── MainWindow.xaml              # Shell layout: menu, header, content area
+    AppRepository "1" o-- "*" Book
+    Book --> BookStatus
+    BaseViewModel <|-- Book : reuses change notification
 ```
 
----
+`Book` derives from `BaseViewModel` to get `INotifyPropertyChanged`, which is what makes the
+auto-save and the live statistics possible. Covers are kept as a `byte[]` inside the JSON file
+(base64), so a `.librepo` is self-contained and can be copied between machines.
 
-## 🔧 Technical Setup
+### Custom controls
 
-**System Requirements:**
-- .NET SDK 8.0+
-- Windows (WPF is Windows-only)
-- Visual Studio 2022 or `dotnet` CLI
+| Control | Dependency properties | Notes |
+| --- | --- | --- |
+| `RatingControl` | `Value`, `IsReadOnly`, `StarSize` | Five `StarItem`s with hover preview and click-to-rate; read-only mode switches the cursor and ignores clicks. |
+| `TagControl` | `Tags`, `IsReadOnly`, `RemoveTagCommand`, `ChipBackground` | Pill chips in a `WrapPanel`; the remove button is hidden through a `DataTrigger` in read-only mode. |
+| `StatisticsBarControl` | none (bound to `StatisticsViewModel`) | Bottom bar in `MainWindow`. |
 
-**Running the Application:**
+Two helpers complete the binding story: `ByteArrayToImageConverter` turns the stored bytes into
+a `BitmapImage` (`BitmapCacheOption.OnLoad`, so the stream can be disposed), and
+`WebBrowserBehavior.Html` is an attached property that calls `NavigateToString` because
+`WebBrowser` has no bindable source property.
+
+## Getting started
+
+### Prerequisites
+
+- Windows 10 or 11 (WPF is Windows-only)
+- [.NET SDK 8.0](https://dotnet.microsoft.com/download/dotnet/8.0) or newer, or Visual Studio
+  2022 with the .NET desktop workload
+
+### Run
 
 ```bash
+git clone https://github.com/anniigr/e-Reader.git
+cd e-Reader
 dotnet run --project BookEditor
 ```
 
-Or open `BookEditor.sln` in Visual Studio and press **F5**.
+Or open `BookEditor.slnx` in Visual Studio 2022 17.10+ and press F5.
 
-**First Launch:**
-1. Click **Create Repository** to create a new `.json` library file.
-2. Use the **Book → Add...** menu item or toolbar button to add your first book.
-3. Attach a cover image, set reading status, add genre tags, and rate the book.
-4. All changes are auto-saved to the repository file instantly.
+### First launch
 
----
+1. Choose `Repository → Open` and select `1.librepo` from the repository root to load the
+   sample library shown in the screenshots (seven books with covers), or `Repository → Create`
+   to start an empty one.
+2. `Book → Add...` opens the edit dialog. Pick a cover (PNG/JPEG) and, optionally, a Markdown
+   file to read.
+3. Double-click a book to open its details; `Czytaj od początku` starts the reader at chapter
+   one, `Kontynuuj czytanie` resumes at the saved chapter.
 
-*Developed as a project for Object-Oriented Programming (Warsaw University of Technology).*
+Sample covers and two more `.librepo` files are in
+`wpf3_granos_anna-master_SampleBookData-covers/`.
+
+## Project structure
+
+```
+e-Reader/
+├── BookEditor.slnx
+├── 1.librepo                        # sample library (JSON, covers embedded)
+├── Images/                          # screenshots used in this README
+├── wpf3_granos_anna-master_SampleBookData-covers/   # sample covers and libraries
+└── BookEditor/
+    ├── App.xaml                     # brushes, ViewModel → View DataTemplates
+    ├── MainWindow.xaml              # menu, header, page host, statistics bar
+    ├── Models/                      # Book, AppRepository
+    ├── ViewModels/                  # Main, Welcome, BookList, BookDetail, BookEdit, Reader, Statistics, RelayCommand, BaseViewModel
+    ├── Views/                       # WelcomeView, BookListView, BookDetailView, ReaderView, BookEditWindow
+    ├── Controls/                    # RatingControl, TagControl, StatisticsBarControl
+    ├── Converters/                  # ByteArrayToImageConverter
+    └── Helpers/                     # WebBrowserBehavior
+```
+
+## Limitations and known issues
+
+- **Windows only, no automated tests.** The project targets `net8.0-windows` with WPF; it
+  cannot be built or run on macOS or Linux, and there is no test project.
+- **Markdown only.** The reader opens `.md` files (the file picker filters for them) and
+  supports headings, bold, italic and inline code. PDF and EPUB are not supported.
+- **Sorting by rating does not work.** `BookListViewModel.ApplyFilters` matches the sort key
+  `"Ocena"` while the option offered in the UI is `"Rating"`, so choosing it falls back to
+  sorting by title.
+- **Whole-file saves.** Every property change rewrites the entire `.librepo`, including all
+  cover bytes. Fine for a personal library, slow for thousands of books with large covers.
+- **No delete confirmation.** `Delete` removes the selected book immediately.
+- **Mixed-language UI.** Buttons and labels are a mix of English and Polish.
+- **`WebBrowser` is the legacy IE-based control.** It renders the generated HTML adequately but
+  is deprecated in favour of WebView2.
